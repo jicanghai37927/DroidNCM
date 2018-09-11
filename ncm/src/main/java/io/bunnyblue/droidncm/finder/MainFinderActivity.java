@@ -1,10 +1,16 @@
 package io.bunnyblue.droidncm.finder;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +23,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.List;
 
 import io.bunnyblue.droidncm.R;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
@@ -56,12 +63,32 @@ public class MainFinderActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this,new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
+            //  requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         //  requestPermissions(new String[]{Androi});
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        if (fragments != null && fragments.size() > 0) {
+            for (Fragment f : fragments) {
+                f.onActivityResult(requestCode, resultCode, data);
+            }
+        }
     }
 
     @Override

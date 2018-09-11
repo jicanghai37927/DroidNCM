@@ -1,5 +1,6 @@
 package io.bunnyblue.droidncm.finder.task;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -13,7 +14,7 @@ import java.util.Collection;
 import io.bunnyblue.droidncm.finder.MainFinderActivity;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
 
-public class NCMFileFinder extends AsyncTask<File, Integer, NCMFileContent> {
+public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
     ProgressDialog progressDialog;
     Context context;
     public NCMFileFinder(Context context) {
@@ -32,7 +33,8 @@ public class NCMFileFinder extends AsyncTask<File, Integer, NCMFileContent> {
                 ncmLocalFile.localPath = localFile.getAbsolutePath();
                 ncmLocalFile.content = localFile.getName();
                 ncmFileContent.addFile(ncmLocalFile);
-                progressDialog.setMessage(ncmLocalFile.content);
+                onProgressUpdate(ncmLocalFile.content);
+
             }
             return ncmFileContent;
 
@@ -50,13 +52,48 @@ public class NCMFileFinder extends AsyncTask<File, Integer, NCMFileContent> {
         progressDialog.setTitle("searching...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(false);
-        progressDialog.show();
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.show();
+            }
+        });
+
+    }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.cancel();
+            }
+        });
+    }
+
+    @Override
+    protected void onProgressUpdate(final String... values) {
+        super.onProgressUpdate(values);
+
+        ((MainFinderActivity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setMessage(values[0]);
+            }
+        });
     }
 
     @Override
     protected void onPostExecute(NCMFileContent ncmFileContent) {
         super.onPostExecute(ncmFileContent);
-        progressDialog.dismiss();
+     //   progressDialog.dismiss();
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.cancel();
+            }
+        });
         if (ncmFileContent == null) {
             Toast.makeText(context, "没有找到文件", Toast.LENGTH_SHORT).show();
         } else {
