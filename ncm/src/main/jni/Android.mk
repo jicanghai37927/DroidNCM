@@ -155,7 +155,9 @@ LOCAL_PATH = $(DROID_NCM_ROOT)
 LOCAL_MODULE    := ncm
 
 LOCAL_SRC_FILES :=  _ncm/cJSON.cpp \
-                    _ncm/main.cpp
+                    _ncm/io_bunnyblue_droidncm_dump_NcmDumper.cpp \
+                    _ncm/ncmcrypt.cpp \
+                    _ncm/aes.cpp
 
 
 
@@ -189,6 +191,6 @@ LOCAL_C_INCLUDES +=  . \
                     wavpack
 
 
-LOCAL_STATIC_LIBRARIES:= libcrypto libtaglib
+LOCAL_STATIC_LIBRARIES:= libtaglib
 
 include $(BUILD_SHARED_LIBRARY)
