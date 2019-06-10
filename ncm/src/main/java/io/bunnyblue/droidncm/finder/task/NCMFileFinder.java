@@ -1,5 +1,6 @@
 package io.bunnyblue.droidncm.finder.task;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -17,25 +18,31 @@ import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
 public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
     ProgressDialog progressDialog;
     Context context;
+
     public NCMFileFinder(Context context) {
         this.context = context;
     }
 
+    @SuppressLint("WrongThread")
     @Override
     protected NCMFileContent doInBackground(File... files) {
         if (files != null) {
-            File file = files[0];
-            Collection<File> fileCollection = FileUtils.listFiles(file, new String[]{"ncm"}, true);
             NCMFileContent ncmFileContent = new NCMFileContent();
-            for (File localFile :
-                    fileCollection) {
-                NCMFileContent.NCMLocalFile ncmLocalFile = new NCMFileContent.NCMLocalFile();
-                ncmLocalFile.localPath = localFile.getAbsolutePath();
-                ncmLocalFile.content = localFile.getName();
-                ncmFileContent.addFile(ncmLocalFile);
-                onProgressUpdate(ncmLocalFile.content);
+            for (File file : files) {
 
+                Collection<File> fileCollection = FileUtils.listFiles(file, new String[]{"ncm"}, true);
+
+                for (File localFile :
+                        fileCollection) {
+                    NCMFileContent.NCMLocalFile ncmLocalFile = new NCMFileContent.NCMLocalFile();
+                    ncmLocalFile.localPath = localFile.getAbsolutePath();
+                    ncmLocalFile.content = localFile.getName();
+                    ncmFileContent.addFile(ncmLocalFile);
+                    onProgressUpdate(ncmLocalFile.content);
+
+                }
             }
+
             return ncmFileContent;
 
 
@@ -52,7 +59,7 @@ public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
         progressDialog.setTitle("searching...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(false);
-        ((Activity)context).runOnUiThread(new Runnable() {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.show();
@@ -64,7 +71,7 @@ public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        ((Activity)context).runOnUiThread(new Runnable() {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.cancel();
@@ -87,8 +94,8 @@ public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
     @Override
     protected void onPostExecute(NCMFileContent ncmFileContent) {
         super.onPostExecute(ncmFileContent);
-     //   progressDialog.dismiss();
-        ((Activity)context).runOnUiThread(new Runnable() {
+        //   progressDialog.dismiss();
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog.cancel();

@@ -2,21 +2,24 @@ package io.bunnyblue.droidncm.finder;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,16 +33,25 @@ import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
 import io.bunnyblue.droidncm.finder.task.AboutFragment;
 import io.bunnyblue.droidncm.finder.task.FileConvertTask;
 import io.bunnyblue.droidncm.finder.task.NCMFileFinder;
+import io.bunnyblue.droidncm.utils.DocumentsUtils;
 
 public class MainFinderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public NCMFileContent ncmFileContent = null;
     public AboutFragment aboutFragment = null;
     LocalFileFragment localFileFragment = new LocalFileFragment(ncmFileContent);
+    String rootPath = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String[] paths = DocumentsUtils.getExtSdCardPath(this);
+        if (paths != null && paths.length > 0)
+        {
+            rootPath = paths[0];
+        }
+
+        Log.d("ncm","rootPath "+rootPath);
         setContentView(R.layout.activity_main_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,7 +61,12 @@ public class MainFinderActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 NCMFileFinder ncmFileFinder = new NCMFileFinder(MainFinderActivity.this);
-                ncmFileFinder.execute(new File(Environment.getExternalStorageDirectory(), "netease"));
+                if (rootPath != null) {
+                    Log.d("ncm","rootPath "+rootPath);
+                    ncmFileFinder.execute(new File(Environment.getExternalStorageDirectory(), "netease"), new File(rootPath));
+                } else {
+                    ncmFileFinder.execute(new File(Environment.getExternalStorageDirectory(), "netease"));
+                }
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
             }
@@ -64,8 +81,12 @@ public class MainFinderActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ActivityCompat.requestPermissions(this,new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
+
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 0x11);
             //  requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
+        }
+        if (!DocumentsUtils.checkWritableRootPath(this, rootPath)) {
+            showOpenDocumentTree();
         }
     }
 
@@ -76,12 +97,40 @@ public class MainFinderActivity extends AppCompatActivity
         //  requestPermissions(new String[]{Androi});
     }
 
+
+    private void showOpenDocumentTree() {
+        Intent intent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            StorageManager sm = getSystemService(StorageManager.class);
+
+            StorageVolume volume = sm.getStorageVolume(new File(rootPath));
+
+            if (volume != null) {
+                intent = volume.createAccessIntent(null);
+            }
+        }
+
+        if (intent == null) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        }
+        startActivityForResult(intent, DocumentsUtils.OPEN_DOCUMENT_TREE_CODE);
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == DocumentsUtils.OPEN_DOCUMENT_TREE_CODE) {
+
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                DocumentsUtils.saveTreeUri(this, rootPath, uri);
+            }
+        }
         if (resultCode != RESULT_OK) {
             return;
         }
+
         FragmentManager fm = getSupportFragmentManager();
         List<Fragment> fragments = fm.getFragments();
         if (fragments != null && fragments.size() > 0) {

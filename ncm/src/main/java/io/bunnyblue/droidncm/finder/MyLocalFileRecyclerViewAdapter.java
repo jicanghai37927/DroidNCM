@@ -41,7 +41,7 @@ public class MyLocalFileRecyclerViewAdapter extends RecyclerView.Adapter<MyLocal
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
-
+        holder.mPath.setText(mValues.get(position).localPath);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +74,7 @@ public class MyLocalFileRecyclerViewAdapter extends RecyclerView.Adapter<MyLocal
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final TextView mPath;
         public NCMLocalFile mItem;
 
         public ViewHolder(View view) {
@@ -81,6 +82,7 @@ public class MyLocalFileRecyclerViewAdapter extends RecyclerView.Adapter<MyLocal
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.item_number);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mPath = view.findViewById(R.id.ncmPath);
         }
 
         @Override
