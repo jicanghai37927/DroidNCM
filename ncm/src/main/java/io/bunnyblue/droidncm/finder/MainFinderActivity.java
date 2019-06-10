@@ -85,8 +85,11 @@ public class MainFinderActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 0x11);
             //  requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
         }
-        if (!DocumentsUtils.checkWritableRootPath(this, rootPath)) {
-            showOpenDocumentTree();
+        if (rootPath!=null)
+        {
+            if (!DocumentsUtils.checkWritableRootPath(this, rootPath)) {
+                showOpenDocumentTree();
+            }
         }
     }
 
