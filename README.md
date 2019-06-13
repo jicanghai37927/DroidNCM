@@ -6,7 +6,8 @@ DroidNCM -Android ncm格式转换器
 
   NDK r17
   
- #output
+ # output
+ 
  文件会产生到/sdcard/Music目录下
   
 # bug
