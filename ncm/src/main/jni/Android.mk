@@ -192,5 +192,5 @@ LOCAL_C_INCLUDES +=  . \
 
 
 LOCAL_STATIC_LIBRARIES:= libtaglib
-
+LOCAL_LDLIBS := -llog
 include $(BUILD_SHARED_LIBRARY)

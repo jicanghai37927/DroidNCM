@@ -1,6 +1,7 @@
 package io.bunnyblue.droidncm.finder;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,10 +39,19 @@ public class MyLocalFileRecyclerViewAdapter extends RecyclerView.Adapter<MyLocal
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
-        holder.mPath.setText(mValues.get(position).localPath);
+        NCMLocalFile ncmLocalFile = mValues.get(position);
+        holder.mItem = ncmLocalFile;
+        holder.mIdView.setText(ncmLocalFile.id);
+        if (TextUtils.isEmpty(ncmLocalFile.error)) {
+            if (TextUtils.isEmpty(ncmLocalFile.targetPath)) {
+                holder.mContentView.setText(ncmLocalFile.content);
+            } else {
+                holder.mContentView.setText(ncmLocalFile.targetPath);
+            }
+        }else {
+            holder.mContentView.setText(ncmLocalFile.error);
+        }
+        holder.mPath.setText(ncmLocalFile.localPath);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

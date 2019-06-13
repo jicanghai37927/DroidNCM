@@ -3,6 +3,7 @@ package io.bunnyblue.droidncm.finder.task;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import java.io.File;
@@ -11,37 +12,34 @@ import io.bunnyblue.droidncm.dump.NcmDumper;
 import io.bunnyblue.droidncm.finder.MainFinderActivity;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
 
-public class FileConvertTask extends AsyncTask<NCMFileContent, String, Integer> {
+public class OneConvertTask extends AsyncTask<NCMFileContent.NCMLocalFile, String, NCMFileContent.NCMLocalFile> {
     ProgressDialog progressDialog;
     Context context;
-    public FileConvertTask(Context context) {
+
+    public OneConvertTask(Context context) {
         this.context = context;
     }
 
     @Override
-    protected Integer doInBackground(NCMFileContent ...contents) {
+    protected NCMFileContent.NCMLocalFile doInBackground(NCMFileContent.NCMLocalFile... contents) {
         int index = 0;
-        NCMFileContent content=contents[0];
-        for (NCMFileContent.NCMLocalFile srcFile : content.getITEMS()) {
-            File file=new File(srcFile.localPath);
-            publishProgress(file.getName());
-            String targetFile = NcmDumper.ncpDump(file.getAbsolutePath());
-            if (targetFile.startsWith("/"))
-            {
-                File target = new File(targetFile);
-                if (target.exists()) {
-                    publishProgress(target.getAbsolutePath());
-                    srcFile.targetPath=target.getAbsolutePath();
-                    index++;
-                    //  return target;
-                }
-            }else {
-                srcFile.error= targetFile;
+        NCMFileContent.NCMLocalFile ncmLocalFile = contents[0];
+        File srcFile = new File(ncmLocalFile.localPath);
+        publishProgress(srcFile.getName());
+        String targetFile = NcmDumper.ncpDump(srcFile.getAbsolutePath());
+        if (targetFile.startsWith("/")) {
+            File target = new File(targetFile);
+            if (target.exists()) {
+                ncmLocalFile.targetPath = targetFile;
+                return ncmLocalFile;
+                //  return target;
             }
+        } else {
+            ncmLocalFile.error = targetFile;
         }
 
 
-        return index;
+        return ncmLocalFile;
     }
 
     @Override
@@ -66,13 +64,15 @@ public class FileConvertTask extends AsyncTask<NCMFileContent, String, Integer> 
     }
 
     @Override
-    protected void onPostExecute(Integer file) {
+    protected void onPostExecute(NCMFileContent.NCMLocalFile file) {
         super.onPostExecute(file);
         progressDialog.dismiss();
-        ((MainFinderActivity) context).updateNCMFileList();
-        if (file != 0) {
-            Toast.makeText(context, "new file  count :" + file, Toast.LENGTH_SHORT).show();
+        if (!TextUtils.isEmpty(file.error)) {
+            Toast.makeText(context, file.error, Toast.LENGTH_SHORT).show();
         }
+
+        ((MainFinderActivity) context).updateNCMFileList();
+
     }
 
 }

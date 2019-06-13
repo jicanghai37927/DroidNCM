@@ -29,6 +29,9 @@ public class NCMFileFinder extends AsyncTask<File, String, NCMFileContent> {
         if (files != null) {
             NCMFileContent ncmFileContent = new NCMFileContent();
             for (File file : files) {
+                if (!file.exists()){
+                    continue ;
+                }
 
                 Collection<File> fileCollection = FileUtils.listFiles(file, new String[]{"ncm"}, true);
 

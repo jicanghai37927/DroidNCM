@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import java.io.File;
 
@@ -22,6 +24,7 @@ import io.bunnyblue.droidncm.R;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent.NCMLocalFile;
 import io.bunnyblue.droidncm.finder.task.FileConvertTask;
+import io.bunnyblue.droidncm.finder.task.OneConvertTask;
 
 /**
  * A fragment representing a list of Items.
@@ -46,8 +49,8 @@ public class LocalFileFragment extends Fragment {
             builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    FileConvertTask convertTask = new FileConvertTask(getContext());
-                    convertTask.execute(new File(item.localPath));
+                    OneConvertTask convertTask = new OneConvertTask(getContext());
+                    convertTask.execute(item);
                 }
             });
             builder.create().show();
@@ -100,11 +103,16 @@ public class LocalFileFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
+
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                    LinearLayout.VERTICAL);
+            recyclerView.addItemDecoration(dividerItemDecoration);
             recyclerView.setAdapter(new MyLocalFileRecyclerViewAdapter(ncmFileContent, mListener));
         }
         return view;

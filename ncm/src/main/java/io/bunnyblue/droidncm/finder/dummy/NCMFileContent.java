@@ -56,6 +56,7 @@ public class NCMFileContent {
         public String details;
         public String localPath;
         public String targetPath;
+        public String error=null;
 
         public NCMLocalFile() {
 

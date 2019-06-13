@@ -46,12 +46,11 @@ public class MainFinderActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String[] paths = DocumentsUtils.getExtSdCardPath(this);
-        if (paths != null && paths.length > 0)
-        {
+        if (paths != null && paths.length > 0) {
             rootPath = paths[0];
         }
 
-        Log.d("ncm","rootPath "+rootPath);
+        Log.d("ncm", "rootPath " + rootPath);
         setContentView(R.layout.activity_main_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -62,7 +61,7 @@ public class MainFinderActivity extends AppCompatActivity
             public void onClick(View view) {
                 NCMFileFinder ncmFileFinder = new NCMFileFinder(MainFinderActivity.this);
                 if (rootPath != null) {
-                    Log.d("ncm","rootPath "+rootPath);
+                    Log.d("ncm", "rootPath " + rootPath);
                     ncmFileFinder.execute(new File(Environment.getExternalStorageDirectory(), "netease"), new File(rootPath));
                 } else {
                     ncmFileFinder.execute(new File(Environment.getExternalStorageDirectory(), "netease"));
@@ -85,12 +84,24 @@ public class MainFinderActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 0x11);
             //  requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},0x11);
         }
-        if (rootPath!=null)
-        {
+        if (rootPath != null) {
             if (!DocumentsUtils.checkWritableRootPath(this, rootPath)) {
                 showOpenDocumentTree();
             }
         }
+        help();
+    }
+
+    void help() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Usage");
+        builder.setMessage("点击信封扫面歌曲");
+        builder.setPositiveButton("🐻OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }).create().show();
     }
 
     @Override
@@ -190,7 +201,7 @@ public class MainFinderActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 FileConvertTask convertTask = new FileConvertTask(MainFinderActivity.this);
 
-                convertTask.execute(ncmFileContent.getFiles());
+                convertTask.execute(ncmFileContent);
             }
         }).create().show();
 
@@ -229,6 +240,16 @@ public class MainFinderActivity extends AppCompatActivity
     }
 
     public void updateNCMFileList() {
+        if (ncmFileContent == null || ncmFileContent.getITEMS().isEmpty()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("DroidNCM").setMessage("没有找到文件").setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            }).create().show();
+
+        }
         localFileFragment.updateFileList(ncmFileContent);
 
 
