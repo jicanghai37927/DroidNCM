@@ -21,5 +21,5 @@ before_script:
 script:
   # scripts excutes inside our repo directory on CI machine
   - export SAMPLE_CI_RESULT=0
-  -  cd ncm/src/main/jni/ && ndk-build
+  -  cd ncm/src/main/jni/ && $ANDROID_NDK_HOME/ndk-build
   -  cd ../../../../ &&./gradlew assembleDebug
