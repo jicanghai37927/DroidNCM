@@ -6,6 +6,8 @@ android:
     - platform-tools
     - extra-google-m2repository
     - extra-android-m2repository
+  licenses:
+    - 'android-sdk-license-.+' 
 before_install:
   - sudo apt-get install ant
 install:
