@@ -5,6 +5,16 @@ fork from https://github.com/bunnyblueair/DroidNCM
 
 
 
+# Origin
+
+开发[**神马笔记**](http://andnext.club/whatsnote)的音乐笔记版本，实现将音乐文件添加到笔记时，
+
+发现网易云音乐的部分文件格式是NCM文件。
+
+感谢[DroidNCM](https://github.com/bunnyblueair/DroidNCM)让这个功能得以继续。
+
+
+
 # Change
 
 发现早期版本的DroidNCM无法解析部分的NCM文件。
