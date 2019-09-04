@@ -10,6 +10,7 @@ import java.io.File;
 import io.bunnyblue.droidncm.dump.NcmDumper;
 import io.bunnyblue.droidncm.finder.MainFinderActivity;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
+import io.bunnyblue.droidncm.utils.NcmdumpUtils;
 
 public class FileConvertTask extends AsyncTask<NCMFileContent, String, Integer> {
     ProgressDialog progressDialog;
@@ -25,7 +26,8 @@ public class FileConvertTask extends AsyncTask<NCMFileContent, String, Integer> 
         for (NCMFileContent.NCMLocalFile srcFile : content.getITEMS()) {
             File file=new File(srcFile.localPath);
             publishProgress(file.getName());
-            String targetFile = NcmDumper.ncpDump(file.getAbsolutePath());
+            String targetFile = NcmdumpUtils.ncpDump(file);
+//            String targetFile = NcmDumper.ncpDump(file.getAbsolutePath());
             if (targetFile.startsWith("/"))
             {
                 File target = new File(targetFile);

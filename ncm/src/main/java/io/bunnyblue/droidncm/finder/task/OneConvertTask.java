@@ -11,6 +11,7 @@ import java.io.File;
 import io.bunnyblue.droidncm.dump.NcmDumper;
 import io.bunnyblue.droidncm.finder.MainFinderActivity;
 import io.bunnyblue.droidncm.finder.dummy.NCMFileContent;
+import io.bunnyblue.droidncm.utils.NcmdumpUtils;
 
 public class OneConvertTask extends AsyncTask<NCMFileContent.NCMLocalFile, String, NCMFileContent.NCMLocalFile> {
     ProgressDialog progressDialog;
@@ -26,18 +27,24 @@ public class OneConvertTask extends AsyncTask<NCMFileContent.NCMLocalFile, Strin
         NCMFileContent.NCMLocalFile ncmLocalFile = contents[0];
         File srcFile = new File(ncmLocalFile.localPath);
         publishProgress(srcFile.getName());
-        String targetFile = NcmDumper.ncpDump(srcFile.getAbsolutePath());
+
+        String targetFile = NcmdumpUtils.ncpDump(srcFile);
+//        String targetFile = NcmDumper.ncpDump(srcFile.getAbsolutePath());
         if (targetFile.startsWith("/")) {
             File target = new File(targetFile);
             if (target.exists()) {
                 ncmLocalFile.targetPath = targetFile;
                 return ncmLocalFile;
-                //  return target;
+            } else {
+                ncmLocalFile.error = " 转换失败！";
             }
         } else {
             ncmLocalFile.error = targetFile;
-        }
 
+            if (TextUtils.isEmpty(targetFile)) {
+                ncmLocalFile.error = srcFile.getAbsolutePath() + " 转换失败！";
+            }
+        }
 
         return ncmLocalFile;
     }

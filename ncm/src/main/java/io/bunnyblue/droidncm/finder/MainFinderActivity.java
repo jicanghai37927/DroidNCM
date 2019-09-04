@@ -25,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import org.jaudiotagger.tag.TagOptionSingleton;
+
 import java.io.File;
 import java.util.List;
 
@@ -45,6 +47,9 @@ public class MainFinderActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        TagOptionSingleton.getInstance().setAndroid(false);
+
         String[] paths = DocumentsUtils.getExtSdCardPath(this);
         if (paths != null && paths.length > 0) {
             rootPath = paths[0];
@@ -89,7 +94,7 @@ public class MainFinderActivity extends AppCompatActivity
                 showOpenDocumentTree();
             }
         }
-        help();
+//        help();
     }
 
     void help() {

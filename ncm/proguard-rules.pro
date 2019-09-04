@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+# jaudiotagger
+-dontwarn org.jaudiotagger.**.**
+-keep class org.jaudiotagger.**.** { *; }
+-keep interface org.jaudiotagger.**.** { *; }
+#
+
+-keep class com.yeamy.ncmdump.**.** { *; }
+-keep interface com.yeamy.ncmdump.**.** { *; }
+
+-keep class io.bunnyblue.droidncm.**.** { *; }
+-keep interface io.bunnyblue.droidncm.**.** { *; }
